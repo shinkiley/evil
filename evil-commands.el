@@ -778,18 +778,32 @@ The current position is placed in the jump list."
     (evil--jump-backward 1)
     (evil-set-jump pnt)))
 
+(declare-function xref-backend-identifier-at-point "xref.el")
 (evil-define-motion evil-jump-to-tag (arg)
   "Jump to tag under point.
 If called with a prefix argument, provide a prompt
 for specifying the tag."
   :jump t
   (interactive "P")
-  (if arg (call-interactively #'find-tag)
-    (let ((tag (funcall (or find-tag-default-function
-                            (get major-mode 'find-tag-default-function)
-                            #'find-tag-default))))
-      (unless tag (user-error "No tag candidate found around point"))
-      (find-tag tag))))
+  (cond
+   ((fboundp 'xref-find-definitions)
+    (if arg
+        (progn
+          (universal-argument)
+          (call-interactively #'xref-find-definitions))
+      (let ((tag (xref-backend-identifier-at-point (xref-find-backend))))
+        (unless tag
+          (user-error "No tag candidate found around point"))
+        (xref-find-definitions tag))))
+   ((fboundp 'find-tag)
+    (if arg
+        (call-interactively #'find-tag)
+      (let ((tag (funcall (or find-tag-default-function
+                              (get major-mode 'find-tag-default-function)
+                              #'find-tag-default))))
+        (unless tag
+          (user-error "No tag candidate found around point"))
+        (find-tag tag))))))
 
 (evil-define-motion evil-lookup ()
   "Look up the keyword at point.
