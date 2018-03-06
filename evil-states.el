@@ -31,11 +31,26 @@
 
 ;;; Normal state
 
+(evil-define-state basic
+  "Basic state."
+  :tag " <B> "
+  :suppress-keymap t)
+
+(evil-define-state basic-normal
+  "Basic normal state."
+  :tag " <BN> "
+  :enable (basic))
+
+(evil-define-state basic-motion
+  "Basic motion state."
+  :tag " <BM> "
+  :enable (basic))
+
 (evil-define-state normal
   "Normal state.
 AKA \"Command\" state."
   :tag " <N> "
-  :enable (motion)
+  :enable (basic-motion basic-normal)
   :exit-hook (evil-repeat-start-hook)
   (cond
    ((evil-normal-state-p)
@@ -270,7 +285,7 @@ the selection is enabled.
 (evil-define-state visual
   "Visual state."
   :tag " <V> "
-  :enable (motion normal)
+  :enable (basic-motion)
   :message 'evil-visual-message
   (cond
    ((evil-visual-state-p)
@@ -887,7 +902,7 @@ CORNER defaults to `upper-left'."
 (evil-define-state motion
   "Motion state."
   :tag " <M> "
-  :suppress-keymap t)
+  :enable (basic-motion))
 
 ;;; Emacs state
 
